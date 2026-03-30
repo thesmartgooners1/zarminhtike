@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>My Blog App</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f2f2f2;
+    }
+
+    /* Top App Bar */
+    .app-bar {
+      background: #111;
+      color: #fff;
+      padding: 15px;
+      text-align: center;
+      font-size: 18px;
+      font-weight: bold;
+      position: sticky;
+      top: 0;
+    }
+
+    /* Container */
+    .container {
+      padding: 10px;
+    }
+
+    /* Post Card */
+    .card {
+      background: #fff;
+      border-radius: 15px;
+      margin-bottom: 15px;
+      padding: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      transition: 0.2s;
+    }
+
+    .card:active {
+      transform: scale(0.98);
+    }
+
+    .title {
+      font-size: 16px;
+      font-weight: bold;
+      margin-bottom: 8px;
+    }
+
+    .title a {
+      text-decoration: none;
+      color: #111;
+    }
+
+    .desc {
+      font-size: 13px;
+      color: #555;
+      line-height: 1.4;
+    }
+
+    .btn {
+      display: inline-block;
+      margin-top: 10px;
+      padding: 6px 10px;
+      background: #111;
+      color: #fff;
+      border-radius: 8px;
+      font-size: 12px;
+      text-decoration: none;
+    }
+
+    /* Loading */
+    .loading {
+      text-align: center;
+      padding: 20px;
+      color: #777;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="app-bar">
+  My Blog
+</div>
+
+<div class="container" id="posts">
+  <div class="loading">Loading posts...</div>
+</div>
+
+<script>
+function handleData(data) {
+  const container = document.getElementById("posts");
+
+  if (!data.feed || !data.feed.entry) {
+    container.innerHTML = "<p>No posts found.</p>";
+    return;
+  }
+
+  let html = "";
+
+  data.feed.entry.forEach(post => {
+    const title = post.title ? post.title.$t : "No Title";
+
+    const linkObj = post.link.find(l => l.rel === "alternate");
+    const link = linkObj ? linkObj.href : "#";
+
+    const content = post.content ? post.content.$t : "";
+    const cleanContent = content.replace(/<[^>]*>/g, "");
+
+    html += `
+      <div class="card">
+        <div class="title">
+          <a href="${link}" target="_blank">${title}</a>
+        </div>
+        <div class="desc">
+          ${cleanContent.substring(0, 120)}...
+        </div>
+        <a class="btn" href="${link}" target="_blank">Read</a>
+      </div>
+    `;
+  });
+
+  container.innerHTML = html;
+}
+</script>
+
+<!-- Blogger JSONP Feed -->
+<script src="https://zarminhtike.blogspot.com/feeds/posts/default?alt=json-in-script&callback=handleData"></script>
+
+</body>
+</html>
