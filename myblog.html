@@ -3,23 +3,54 @@
 <head>
   <title>My Blog App</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
   <style>
+    :root {
+      --bg: #f2f2f2;
+      --text: #111;
+      --card-bg: #fff;
+      --btn-bg: #111;
+      --btn-text: #fff;
+    }
+
+    body.dark-mode {
+      --bg: #121212;
+      --text: #eee;
+      --card-bg: #1e1e1e;
+      --btn-bg: #eee;
+      --btn-text: #111;
+    }
+
     body {
       margin: 0;
       font-family: Arial, sans-serif;
-      background: #f2f2f2;
+      background: var(--bg);
+      color: var(--text);
+      transition: background 0.3s, color 0.3s;
     }
 
     .app-bar {
-      background: #111;
-      color: #fff;
+      background: var(--btn-bg);
+      color: var(--btn-text);
       padding: 15px;
       text-align: center;
       font-size: 18px;
       font-weight: bold;
       position: sticky;
       top: 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .toggle-btn {
+      padding: 6px 12px;
+      font-size: 12px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      background: var(--btn-text);
+      color: var(--btn-bg);
+      transition: 0.3s;
     }
 
     .container {
@@ -27,12 +58,16 @@
     }
 
     .card {
-      background: #fff;
+      background: var(--card-bg);
       border-radius: 15px;
       margin-bottom: 15px;
       padding: 12px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-      transition: 0.2s;
+      transition: transform 0.2s, background 0.3s;
+    }
+
+    .card:active {
+      transform: scale(0.98);
     }
 
     .card img {
@@ -49,12 +84,13 @@
 
     .title a {
       text-decoration: none;
-      color: #111;
+      color: var(--text);
     }
 
     .desc {
       font-size: 13px;
-      color: #555;
+      color: var(--text);
+      opacity: 0.8;
       line-height: 1.4;
     }
 
@@ -62,8 +98,8 @@
       display: inline-block;
       margin-top: 10px;
       padding: 6px 10px;
-      background: #111;
-      color: #fff;
+      background: var(--btn-bg);
+      color: var(--btn-text);
       border-radius: 8px;
       font-size: 12px;
       text-decoration: none;
@@ -72,15 +108,16 @@
     .loading {
       text-align: center;
       padding: 20px;
-      color: #777;
+      color: var(--text);
+      opacity: 0.6;
     }
   </style>
 </head>
-
 <body>
 
 <div class="app-bar">
   My Blog
+  <button class="toggle-btn" onclick="toggleDarkMode()">Dark Mode</button>
 </div>
 
 <div class="container" id="posts">
@@ -88,9 +125,13 @@
 </div>
 
 <script>
+function toggleDarkMode() {
+  document.body.classList.toggle("dark-mode");
+}
+
 async function loadPosts() {
   const container = document.getElementById("posts");
-  const apiURL = "https://zarminhtike.wordpress.com/wp-json/wp/v2/posts?_embed";
+  const apiURL = "https://public-api.wordpress.com/wp/v2/sites/zarminhtike.wordpress.com/posts";
 
   try {
     const res = await fetch(apiURL);
@@ -104,13 +145,14 @@ async function loadPosts() {
     let html = "";
 
     data.forEach(post => {
-      const title = post.title.rendered;
-      const link = post.link;
-      const excerpt = post.excerpt.rendered.replace(/<[^>]*>/g, "").substring(0, 120);
+      const title = post.title || "No Title";
+      const link = post.URL;
+      const excerpt = post.excerpt || "";
+      const cleanExcerpt = excerpt.replace(/<[^>]*>/g, "").substring(0, 120);
 
       let image = "";
-      if (post._embedded && post._embedded["wp:featuredmedia"]) {
-        image = post._embedded["wp:featuredmedia"][0].source_url;
+      if (post.featured_media_urls && post.featured_media_urls.full) {
+        image = post.featured_media_urls.full;
       }
 
       html += `
@@ -119,7 +161,7 @@ async function loadPosts() {
           <div class="title">
             <a href="${link}" target="_blank">${title}</a>
           </div>
-          <div class="desc">${excerpt}...</div>
+          <div class="desc">${cleanExcerpt}...</div>
           <a class="btn" href="${link}" target="_blank">Read</a>
         </div>
       `;
@@ -129,7 +171,7 @@ async function loadPosts() {
 
   } catch (error) {
     container.innerHTML = "<p>Error loading posts.</p>";
-    console.error("ERROR:", error);
+    console.error(error);
   }
 }
 
