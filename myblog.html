@@ -90,44 +90,50 @@
 </div>
 
 <script>
-function handleData(data) {
+async function loadPosts() {
   const container = document.getElementById("posts");
 
-  if (!data.feed || !data.feed.entry) {
-    container.innerHTML = "<p>No posts found.</p>";
-    return;
+  try {
+    const res = await fetch("https://zarminhtike.wordpress.com/wp-json/wp/v2/posts");
+    const data = await res.json();
+
+    if (!data || data.length === 0) {
+      container.innerHTML = "<p>No posts found.</p>";
+      return;
+    }
+
+    let html = "";
+
+    data.forEach(post => {
+      const title = post.title.rendered;
+      const link = post.link;
+
+      const content = post.excerpt.rendered;
+      const cleanContent = content.replace(/<[^>]*>/g, "");
+
+      html += `
+        <div class="card">
+          <div class="title">
+            <a href="${link}" target="_blank">${title}</a>
+          </div>
+          <div class="desc">
+            ${cleanContent.substring(0, 120)}...
+          </div>
+          <a class="btn" href="${link}" target="_blank">Read</a>
+        </div>
+      `;
+    });
+
+    container.innerHTML = html;
+
+  } catch (error) {
+    container.innerHTML = "<p>Error loading posts.</p>";
+    console.error(error);
   }
-
-  let html = "";
-
-  data.feed.entry.forEach(post => {
-    const title = post.title ? post.title.$t : "No Title";
-
-    const linkObj = post.link.find(l => l.rel === "alternate");
-    const link = linkObj ? linkObj.href : "#";
-
-    const content = post.content ? post.content.$t : "";
-    const cleanContent = content.replace(/<[^>]*>/g, "");
-
-    html += `
-      <div class="card">
-        <div class="title">
-          <a href="${link}" target="_blank">${title}</a>
-        </div>
-        <div class="desc">
-          ${cleanContent.substring(0, 120)}...
-        </div>
-        <a class="btn" href="${link}" target="_blank">Read</a>
-      </div>
-    `;
-  });
-
-  container.innerHTML = html;
 }
-</script>
 
-<!-- Blogger JSONP Feed -->
-<script src="https://zarminhtike.blogspot.com/feeds/posts/default?alt=json-in-script&callback=handleData"></script>
+loadPosts();
+</script>
 
 </body>
 </html>
