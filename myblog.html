@@ -35,10 +35,6 @@
       transition: 0.2s;
     }
 
-    .card:active {
-      transform: scale(0.98);
-    }
-
     .card img {
       width: 100%;
       border-radius: 10px;
@@ -96,10 +92,16 @@ async function loadPosts() {
   const container = document.getElementById("posts");
 
   try {
-    const apiURL = "https://zarminhtike.wordpress.com/wp-json/wp/v2/posts?_embed";
+    const api = "https://zarminhtike.wordpress.com/wp-json/wp/v2/posts?_embed";
 
-    // Fix CORS using proxy
-    const res = await fetch("https://api.allorigins.win/raw?url=" + encodeURIComponent(apiURL));
+    // Try direct fetch first
+    let res = await fetch(api);
+
+    // If blocked, fallback to proxy
+    if (!res.ok) {
+      res = await fetch("https://api.allorigins.win/raw?url=" + encodeURIComponent(api));
+    }
+
     const data = await res.json();
 
     if (!data || data.length === 0) {
@@ -114,7 +116,7 @@ async function loadPosts() {
       const link = post.link;
 
       const content = post.excerpt.rendered;
-      const cleanContent = content.replace(/<[^>]*>/g, "");
+      const clean = content.replace(/<[^>]*>/g, "");
 
       let image = "";
       if (post._embedded && post._embedded["wp:featuredmedia"]) {
@@ -123,12 +125,12 @@ async function loadPosts() {
 
       html += `
         <div class="card">
-          ${image ? `<img src="${image}" alt="">` : ""}
+          ${image ? `<img src="${image}">` : ""}
           <div class="title">
             <a href="${link}" target="_blank">${title}</a>
           </div>
           <div class="desc">
-            ${cleanContent.substring(0, 120)}...
+            ${clean.substring(0, 120)}...
           </div>
           <a class="btn" href="${link}" target="_blank">Read</a>
         </div>
@@ -137,9 +139,9 @@ async function loadPosts() {
 
     container.innerHTML = html;
 
-  } catch (error) {
-    container.innerHTML = "<p>Error loading posts.</p>";
-    console.error(error);
+  } catch (err) {
+    container.innerHTML = "<p>Failed to load posts.</p>";
+    console.error("ERROR:", err);
   }
 }
 
