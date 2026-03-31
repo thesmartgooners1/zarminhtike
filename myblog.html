@@ -11,7 +11,6 @@
       background: #f2f2f2;
     }
 
-    /* Top App Bar */
     .app-bar {
       background: #111;
       color: #fff;
@@ -23,12 +22,10 @@
       top: 0;
     }
 
-    /* Container */
     .container {
       padding: 10px;
     }
 
-    /* Post Card */
     .card {
       background: #fff;
       border-radius: 15px;
@@ -40,6 +37,12 @@
 
     .card:active {
       transform: scale(0.98);
+    }
+
+    .card img {
+      width: 100%;
+      border-radius: 10px;
+      margin-bottom: 8px;
     }
 
     .title {
@@ -70,7 +73,6 @@
       text-decoration: none;
     }
 
-    /* Loading */
     .loading {
       text-align: center;
       padding: 20px;
@@ -94,7 +96,10 @@ async function loadPosts() {
   const container = document.getElementById("posts");
 
   try {
-    const res = await fetch("https://zarminhtike.wordpress.com/wp-json/wp/v2/posts");
+    const apiURL = "https://zarminhtike.wordpress.com/wp-json/wp/v2/posts?_embed";
+
+    // Fix CORS using proxy
+    const res = await fetch("https://api.allorigins.win/raw?url=" + encodeURIComponent(apiURL));
     const data = await res.json();
 
     if (!data || data.length === 0) {
@@ -111,8 +116,14 @@ async function loadPosts() {
       const content = post.excerpt.rendered;
       const cleanContent = content.replace(/<[^>]*>/g, "");
 
+      let image = "";
+      if (post._embedded && post._embedded["wp:featuredmedia"]) {
+        image = post._embedded["wp:featuredmedia"][0].source_url;
+      }
+
       html += `
         <div class="card">
+          ${image ? `<img src="${image}" alt="">` : ""}
           <div class="title">
             <a href="${link}" target="_blank">${title}</a>
           </div>
