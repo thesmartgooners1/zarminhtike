@@ -1,175 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mini Facebook Post UI</title>
-<style>
-    body {
-        font-family: Arial, sans-serif;
-        background: #f0f2f5;
-        display: flex;
-        justify-content: center;
-        padding: 20px;
-    }
-
-    .container {
-        width: 500px;
-    }
-
-    .create-post {
-        background: #fff;
-        padding: 15px;
-        border-radius: 10px;
-        margin-bottom: 20px;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-    }
-
-    .create-post textarea {
-        width: 100%;
-        resize: none;
-        border-radius: 5px;
-        border: 1px solid #ccc;
-        padding: 10px;
-    }
-
-    .create-post input[type="file"] {
-        margin-top: 10px;
-    }
-
-    .create-post button {
-        margin-top: 10px;
-        padding: 10px 20px;
-        background: #1877f2;
-        color: #fff;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-    }
-
-    .posts {
-        display: flex;
-        flex-direction: column;
-        gap: 15px;
-    }
-
-    .post {
-        background: #fff;
-        padding: 15px;
-        border-radius: 10px;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        position: relative;
-    }
-
-    .post img {
-        max-width: 100%;
-        margin-top: 10px;
-        border-radius: 5px;
-    }
-
-    .post .edit-btn {
-        position: absolute;
-        top: 10px;
-        right: 10px;
-        background: #ffc107;
-        border: none;
-        padding: 5px 10px;
-        border-radius: 5px;
-        cursor: pointer;
-    }
-
-    .post textarea {
-        width: 100%;
-        resize: none;
-        border-radius: 5px;
-        border: 1px solid #ccc;
-        padding: 10px;
-    }
-
-    .post .save-btn {
-        margin-top: 10px;
-        padding: 5px 15px;
-        background: #28a745;
-        color: #fff;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-    }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Blog</title>
+  <link rel="stylesheet" href="blog.css">
 </head>
 <body>
-<div class="container">
-    <div class="create-post">
-        <textarea id="postText" rows="3" placeholder="What's on your mind?"></textarea>
-        <input type="file" id="postImage">
-        <button onclick="createPost()">Post</button>
-    </div>
+  <header>
+    <h1>My Blog</h1>
+    <a href="admin.html">Admin Panel</a>
+  </header>
 
-    <div class="posts" id="postsContainer">
-        <!-- Posts will appear here -->
-    </div>
-</div>
+  <main id="blog-posts">
+    <!-- Blog posts will appear here -->
+  </main>
 
-<script>
-    function createPost() {
-        const text = document.getElementById('postText').value;
-        const fileInput = document.getElementById('postImage');
-        const container = document.getElementById('postsContainer');
-
-        if (!text && !fileInput.files.length) {
-            alert("Please enter text or select an image.");
-            return;
-        }
-
-        const post = document.createElement('div');
-        post.classList.add('post');
-
-        let imageHTML = '';
-        if (fileInput.files.length) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                imageHTML = `<img src="${e.target.result}" alt="Post Image">`;
-                post.innerHTML = `
-                    <div class="post-text">${text}</div>
-                    ${imageHTML}
-                    <button class="edit-btn" onclick="editPost(this)">Edit</button>
-                `;
-            };
-            reader.readAsDataURL(fileInput.files[0]);
-        } else {
-            post.innerHTML = `
-                <div class="post-text">${text}</div>
-                <button class="edit-btn" onclick="editPost(this)">Edit</button>
-            `;
-        }
-
-        container.prepend(post);
-
-        // Reset inputs
-        document.getElementById('postText').value = '';
-        fileInput.value = '';
-    }
-
-    function editPost(btn) {
-        const postDiv = btn.parentElement;
-        const textDiv = postDiv.querySelector('.post-text');
-        const currentText = textDiv.innerText;
-
-        postDiv.innerHTML = `
-            <textarea rows="3">${currentText}</textarea>
-            <button class="save-btn" onclick="savePost(this)">Save</button>
-        `;
-    }
-
-    function savePost(btn) {
-        const postDiv = btn.parentElement;
-        const newText = postDiv.querySelector('textarea').value;
-
-        postDiv.innerHTML = `
-            <div class="post-text">${newText}</div>
-            <button class="edit-btn" onclick="editPost(this)">Edit</button>
-        `;
-    }
-</script>
+  <script src="blog.js"></script>
 </body>
 </html>
