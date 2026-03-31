@@ -35,12 +35,6 @@
       transition: 0.2s;
     }
 
-    .card img {
-      width: 100%;
-      border-radius: 10px;
-      margin-bottom: 8px;
-    }
-
     .title {
       font-size: 16px;
       font-weight: bold;
@@ -76,7 +70,6 @@
     }
   </style>
 </head>
-
 <body>
 
 <div class="app-bar">
@@ -88,49 +81,37 @@
 </div>
 
 <script>
-async function loadPosts() {
+async function loadRSS() {
   const container = document.getElementById("posts");
+  const rssURL = "https://corsproxy.io/?https://zarminhtike.wordpress.com/feed/";
 
   try {
-    const api = "https://zarminhtike.wordpress.com/wp-json/wp/v2/posts?_embed";
+    const response = await fetch(rssURL);
+    const text = await response.text();
+    const parser = new DOMParser();
+    const xml = parser.parseFromString(text, "text/xml");
 
-    // Try direct fetch first
-    let res = await fetch(api);
-
-    // If blocked, fallback to proxy
-    if (!res.ok) {
-      res = await fetch("https://api.allorigins.win/raw?url=" + encodeURIComponent(api));
-    }
-
-    const data = await res.json();
-
-    if (!data || data.length === 0) {
+    const items = xml.querySelectorAll("item");
+    if (items.length === 0) {
       container.innerHTML = "<p>No posts found.</p>";
       return;
     }
 
     let html = "";
 
-    data.forEach(post => {
-      const title = post.title.rendered;
-      const link = post.link;
-
-      const content = post.excerpt.rendered;
-      const clean = content.replace(/<[^>]*>/g, "");
-
-      let image = "";
-      if (post._embedded && post._embedded["wp:featuredmedia"]) {
-        image = post._embedded["wp:featuredmedia"][0].source_url;
-      }
+    items.forEach(item => {
+      const title = item.querySelector("title")?.textContent || "No Title";
+      const link = item.querySelector("link")?.textContent || "#";
+      const description = item.querySelector("description")?.textContent || "";
+      const cleanDesc = description.replace(/<[^>]*>/g, "").substring(0, 120);
 
       html += `
         <div class="card">
-          ${image ? `<img src="${image}">` : ""}
           <div class="title">
             <a href="${link}" target="_blank">${title}</a>
           </div>
           <div class="desc">
-            ${clean.substring(0, 120)}...
+            ${cleanDesc}...
           </div>
           <a class="btn" href="${link}" target="_blank">Read</a>
         </div>
@@ -139,13 +120,13 @@ async function loadPosts() {
 
     container.innerHTML = html;
 
-  } catch (err) {
-    container.innerHTML = "<p>Failed to load posts.</p>";
-    console.error("ERROR:", err);
+  } catch (error) {
+    container.innerHTML = "<p>Error loading posts.</p>";
+    console.error(error);
   }
 }
 
-loadPosts();
+loadRSS();
 </script>
 
 </body>
