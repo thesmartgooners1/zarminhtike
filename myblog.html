@@ -1,182 +1,175 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>My Blog App</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    :root {
-      --bg: #f2f2f2;
-      --text: #111;
-      --card-bg: #fff;
-      --btn-bg: #111;
-      --btn-text: #fff;
-    }
-
-    body.dark-mode {
-      --bg: #121212;
-      --text: #eee;
-      --card-bg: #1e1e1e;
-      --btn-bg: #eee;
-      --btn-text: #111;
-    }
-
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mini Facebook Post UI</title>
+<style>
     body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      transition: background 0.3s, color 0.3s;
-    }
-
-    .app-bar {
-      background: var(--btn-bg);
-      color: var(--btn-text);
-      padding: 15px;
-      text-align: center;
-      font-size: 18px;
-      font-weight: bold;
-      position: sticky;
-      top: 0;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .toggle-btn {
-      padding: 6px 12px;
-      font-size: 12px;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      background: var(--btn-text);
-      color: var(--btn-bg);
-      transition: 0.3s;
+        font-family: Arial, sans-serif;
+        background: #f0f2f5;
+        display: flex;
+        justify-content: center;
+        padding: 20px;
     }
 
     .container {
-      padding: 10px;
+        width: 500px;
     }
 
-    .card {
-      background: var(--card-bg);
-      border-radius: 15px;
-      margin-bottom: 15px;
-      padding: 12px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-      transition: transform 0.2s, background 0.3s;
+    .create-post {
+        background: #fff;
+        padding: 15px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
     }
 
-    .card:active {
-      transform: scale(0.98);
+    .create-post textarea {
+        width: 100%;
+        resize: none;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+        padding: 10px;
     }
 
-    .card img {
-      width: 100%;
-      border-radius: 10px;
-      margin-bottom: 8px;
+    .create-post input[type="file"] {
+        margin-top: 10px;
     }
 
-    .title {
-      font-size: 16px;
-      font-weight: bold;
-      margin-bottom: 8px;
+    .create-post button {
+        margin-top: 10px;
+        padding: 10px 20px;
+        background: #1877f2;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
     }
 
-    .title a {
-      text-decoration: none;
-      color: var(--text);
+    .posts {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
     }
 
-    .desc {
-      font-size: 13px;
-      color: var(--text);
-      opacity: 0.8;
-      line-height: 1.4;
+    .post {
+        background: #fff;
+        padding: 15px;
+        border-radius: 10px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        position: relative;
     }
 
-    .btn {
-      display: inline-block;
-      margin-top: 10px;
-      padding: 6px 10px;
-      background: var(--btn-bg);
-      color: var(--btn-text);
-      border-radius: 8px;
-      font-size: 12px;
-      text-decoration: none;
+    .post img {
+        max-width: 100%;
+        margin-top: 10px;
+        border-radius: 5px;
     }
 
-    .loading {
-      text-align: center;
-      padding: 20px;
-      color: var(--text);
-      opacity: 0.6;
+    .post .edit-btn {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: #ffc107;
+        border: none;
+        padding: 5px 10px;
+        border-radius: 5px;
+        cursor: pointer;
     }
-  </style>
+
+    .post textarea {
+        width: 100%;
+        resize: none;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+        padding: 10px;
+    }
+
+    .post .save-btn {
+        margin-top: 10px;
+        padding: 5px 15px;
+        background: #28a745;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+</style>
 </head>
 <body>
+<div class="container">
+    <div class="create-post">
+        <textarea id="postText" rows="3" placeholder="What's on your mind?"></textarea>
+        <input type="file" id="postImage">
+        <button onclick="createPost()">Post</button>
+    </div>
 
-<div class="app-bar">
-  My Blog
-  <button class="toggle-btn" onclick="toggleDarkMode()">Dark Mode</button>
-</div>
-
-<div class="container" id="posts">
-  <div class="loading">Loading posts...</div>
+    <div class="posts" id="postsContainer">
+        <!-- Posts will appear here -->
+    </div>
 </div>
 
 <script>
-function toggleDarkMode() {
-  document.body.classList.toggle("dark-mode");
-}
+    function createPost() {
+        const text = document.getElementById('postText').value;
+        const fileInput = document.getElementById('postImage');
+        const container = document.getElementById('postsContainer');
 
-async function loadPosts() {
-  const container = document.getElementById("posts");
-  const apiURL = "https://public-api.wordpress.com/wp/v2/sites/zarminhtike.wordpress.com/posts";
+        if (!text && !fileInput.files.length) {
+            alert("Please enter text or select an image.");
+            return;
+        }
 
-  try {
-    const res = await fetch(apiURL);
-    const data = await res.json();
+        const post = document.createElement('div');
+        post.classList.add('post');
 
-    if (!data || data.length === 0) {
-      container.innerHTML = "<p>No posts found.</p>";
-      return;
+        let imageHTML = '';
+        if (fileInput.files.length) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                imageHTML = `<img src="${e.target.result}" alt="Post Image">`;
+                post.innerHTML = `
+                    <div class="post-text">${text}</div>
+                    ${imageHTML}
+                    <button class="edit-btn" onclick="editPost(this)">Edit</button>
+                `;
+            };
+            reader.readAsDataURL(fileInput.files[0]);
+        } else {
+            post.innerHTML = `
+                <div class="post-text">${text}</div>
+                <button class="edit-btn" onclick="editPost(this)">Edit</button>
+            `;
+        }
+
+        container.prepend(post);
+
+        // Reset inputs
+        document.getElementById('postText').value = '';
+        fileInput.value = '';
     }
 
-    let html = "";
+    function editPost(btn) {
+        const postDiv = btn.parentElement;
+        const textDiv = postDiv.querySelector('.post-text');
+        const currentText = textDiv.innerText;
 
-    data.forEach(post => {
-      const title = post.title || "No Title";
-      const link = post.URL;
-      const excerpt = post.excerpt || "";
-      const cleanExcerpt = excerpt.replace(/<[^>]*>/g, "").substring(0, 120);
+        postDiv.innerHTML = `
+            <textarea rows="3">${currentText}</textarea>
+            <button class="save-btn" onclick="savePost(this)">Save</button>
+        `;
+    }
 
-      let image = "";
-      if (post.featured_media_urls && post.featured_media_urls.full) {
-        image = post.featured_media_urls.full;
-      }
+    function savePost(btn) {
+        const postDiv = btn.parentElement;
+        const newText = postDiv.querySelector('textarea').value;
 
-      html += `
-        <div class="card">
-          ${image ? `<img src="${image}" alt="">` : ""}
-          <div class="title">
-            <a href="${link}" target="_blank">${title}</a>
-          </div>
-          <div class="desc">${cleanExcerpt}...</div>
-          <a class="btn" href="${link}" target="_blank">Read</a>
-        </div>
-      `;
-    });
-
-    container.innerHTML = html;
-
-  } catch (error) {
-    container.innerHTML = "<p>Error loading posts.</p>";
-    console.error(error);
-  }
-}
-
-loadPosts();
+        postDiv.innerHTML = `
+            <div class="post-text">${newText}</div>
+            <button class="edit-btn" onclick="editPost(this)">Edit</button>
+        `;
+    }
 </script>
-
 </body>
 </html>
