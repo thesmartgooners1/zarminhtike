@@ -1,6 +1,6 @@
 const owner = "thesmartgooners1"; // Replace with your GitHub username
-const repo = "my-blog";
-const postsPath = "posts";
+const repo = "zarminhtike";
+const postsPath = "posts/.gitkeep";
 
 async function fetchPosts() {
   try {
