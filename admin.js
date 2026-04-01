@@ -2,7 +2,7 @@
 const token = "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"; // Replace with your private token
 const owner = "thesmartgooners1";           // Replace with your GitHub username
 const repo = "zarminhtike";                         // Your repository name
-const pathPrefix = "posts/";                    // Folder in repo where posts will be stored
+const pathPrefix = "posts/.gitkeep";                    // Folder in repo where posts will be stored
 
 // --- FORM HANDLER ---
 const postForm = document.getElementById("postForm");
