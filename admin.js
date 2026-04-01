@@ -1,5 +1,5 @@
 // --- CONFIGURATION ---
-const token = "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"; // Replace with your private token
+const token = ""; // Replace with your private token
 const owner = "thesmartgooners1";           // Replace with your GitHub username
 const repo = "zarminhtike";                         // Your repository name
 const pathPrefix = "posts/.gitkeep";                    // Folder in repo where posts will be stored
