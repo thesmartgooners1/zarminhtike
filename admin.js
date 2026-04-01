@@ -1,7 +1,7 @@
 // --- CONFIGURATION ---
-const token = "YOUR_NEW_PERSONAL_ACCESS_TOKEN"; // Replace with your private token
-const owner = "YOUR_GITHUB_USERNAME";           // Replace with your GitHub username
-const repo = "my-blog";                         // Your repository name
+const token = "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"; // Replace with your private token
+const owner = "thesmartgooners1";           // Replace with your GitHub username
+const repo = "zarminhtike";                         // Your repository name
 const pathPrefix = "posts/";                    // Folder in repo where posts will be stored
 
 // --- FORM HANDLER ---
