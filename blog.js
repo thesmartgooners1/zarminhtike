@@ -1,4 +1,4 @@
-const owner = "YOUR_GITHUB_USERNAME"; // Replace with your GitHub username
+const owner = "thesmartgooners1"; // Replace with your GitHub username
 const repo = "my-blog";
 const postsPath = "posts";
 
